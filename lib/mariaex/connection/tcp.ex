@@ -1,4 +1,6 @@
 defmodule Mariaex.Connection.Tcp do
+  require Logger
+
   def connect(host, port, socket_options, timeout) do
     sock_opts = [{:packet, :raw}, :binary, active: :false] ++ socket_options
     case :gen_tcp.connect(host, port, sock_opts, timeout) do
@@ -12,7 +14,8 @@ defmodule Mariaex.Connection.Tcp do
           |> max(recbuf)
         :ok = :inet.setopts(sock, [buffer: buffer])
         ok
-      {:error, _} = error ->
+      {:error, reason} = error ->
+        Logger.error("Mariaex fails to connect: #{inspect(host)} #{inspect(reason)} reason: #{inspect(reason)}")
         error
     end
   end
